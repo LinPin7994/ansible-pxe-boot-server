@@ -1,0 +1,110 @@
+---
+- name: Install requirements packeges
+  apt:
+   name:
+    - tftpd-hpa
+    - isc-dhcp-server
+    - nfs-kernel-server
+- name: Copy template config for tftp
+  template:
+    src: "tftpd-hpa.j2"
+    dest: "/etc/default/tftpd-hpa"
+- name: Get syslinux
+  get_url:
+    url: "{{ syslinux_url }}"
+    dest: "/tmp/syslinux.tar.gz"
+- name: Unarchive syslinux
+  unarchive:
+    src: "/tmp/syslinux.tar.gz"
+    dest: "/tmp"
+    remote_src: yes
+- name: register syslinux dir name
+  shell: ls /tmp | grep syslinux | grep -v tar
+  register: syslinux_directory
+- set_fact:
+     syslinux_directory={{ syslinux_directory.stdout }}
+- name: Copy syslinux files
+  shell: |
+     find /tmp/"{{ syslinux_directory }}" -name "memdisk" -type f|xargs -I {} cp '{}' "{{ tftp_root_dir }}"
+     find /tmp/"{{ syslinux_directory }}" -name "pxelinux.0" -type f|xargs -I {} cp '{}' "{{ tftp_root_dir }}"
+     find /tmp/"{{ syslinux_directory }}" -name "*.c32" -type f|xargs -I {} cp '{}' "{{ tftp_root_dir }}"
+- name: Create pxelinux.cfg dir
+  file:
+    path: "{{ tftp_root_dir }}/pxelinux.cfg"
+    state: directory
+- name: Copy template for install linux distr
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - {src: "bsd.j2", dest: "{{ tftp_root_dir }}/pxelinux.cfg/bsd"}
+    - {src: "default.j2", dest: "{{ tftp_root_dir }}/pxelinux.cfg/default"}
+    - {src: "linux.j2", dest: "{{ tftp_root_dir }}/pxelinux.cfg/linux"}
+    - {src: "livecds.j2", dest: "{{ tftp_root_dir }}/pxelinux.cfg/livecds"}
+- name: Create dir for linux distr
+  file:
+    path: "{{ item.path }}"
+    state: directory
+  loop:
+    - {path: "{{ tftp_root_dir }}/{{ dir.bsd_dir }}"}
+    - {path: "{{ tftp_root_dir }}/{{ dir.bsd_dir }}/{{ dir.bsd_dir_version[1] }}"}
+    - {path: "{{ tftp_root_dir }}/{{ dir.bsd_dir }}/{{ dir.bsd_dir_version[0] }}"}
+    - {path: "{{ tftp_root_dir }}/{{ dir.debian_dir }}"}
+    - {path: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[0] }}"}
+    - {path: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[1] }}"}
+    - {path: "{{ tftp_root_dir }}/{{ dir.centos_dir }}"}
+    - {path: "{{ tftp_root_dir }}/{{ dir.centos_dir }}/{{ dir.centos_dir_version }}"}
+    - {path: "{{ tftp_root_dir }}/{{ dir.ubuntu_dir }}"}
+    - {path: "{{ tftp_root_dir }}/{{ dir.ubuntu_dir }}/{{ dir.ubuntu_dir_version[0] }}"}
+    - {path: "{{ tftp_root_dir }}/{{ dir.ubuntu_dir }}/{{ dir.ubuntu_dir_version[1] }}"}
+    - {path: "{{ tftp_root_dir }}/{{ dir.ubuntu_live_dir }}"}
+    - {path: "{{ tftp_root_dir }}/{{ mount_dir }}"}
+- name: Copy dhcpd config
+  template:
+    src: "dhcpd.conf.j2"
+    dest: "/etc/dhcp/dhcpd.conf"
+    backup: yes
+  notify: restart dhcp
+  when: use_local_dhcp == 'yes'
+- name: Download iso, kernel and initrd
+  get_url:
+    url: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+   - {src: "{{ url.bsd11 }}", dest: "{{ tftp_root_dir }}/{{ dir.bsd_dir }}/{{ dir.bsd_dir_version[0] }}/mfsbsd-11.1-RELEASE-amd64.iso"}
+   - {src: "{{ url.bsd12 }}", dest: "{{ tftp_root_dir }}/{{ dir.bsd_dir }}/{{ dir.bsd_dir_version[1] }}/mfsbsd-12.1-RELEASE-amd64.iso"}
+   - {src: "{{ url.centos_7_initrd }}", dest: "{{ tftp_root_dir }}/{{ dir.centos_dir }}/{{ dir.centos_dir_version }}/initrd.img"}
+   - {src: "{{ url.centos_7_kernel }}", dest: "{{ tftp_root_dir }}/{{ dir.centos_dir }}/{{ dir.centos_dir_version }}/vmlinuz"}
+   - {src: "{{ url.debian_9 }}", dest: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[0] }}/netboot.tar.gz"}
+   - {src: "{{ url.debian_10 }}", dest: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[1] }}/netboot.tar.gz"}
+   - {src: "{{ url.ubuntu_xenial }}", dest: "{{ tftp_root_dir }}/{{ dir.ubuntu_dir }}/{{ dir.ubuntu_dir_version[0] }}/netboot.tar.gz"}
+   - {src: "{{ url.ubuntu_focal }}", dest: "{{ tftp_root_dir }}/{{ dir.ubuntu_dir }}/{{ dir.ubuntu_dir_version[1] }}/netboot.tar.gz"}
+   - {src: "{{ url.ubuntu_xenial_live }}", dest: "{{ tftp_root_dir }}/{{ dir.ubuntu_live_dir }}/ubuntu-16.04.7-desktop-amd64.iso"}
+- name: Unarchive netboot.tar.gz
+  unarchive:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    remote_src: yes
+  loop:
+   - {src: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[0] }}/netboot.tar.gz", dest: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[0] }}"}
+   - {src: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[1] }}/netboot.tar.gz", dest: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[1] }}"}
+   - {src: "{{ tftp_root_dir }}/{{ dir.ubuntu_dir }}/{{ dir.ubuntu_dir_version[0] }}/netboot.tar.gz", dest: "{{ tftp_root_dir }}/{{ dir.ubuntu_dir }}/{{ dir.ubuntu_dir_version[0] }}"}
+   - {src: "{{ tftp_root_dir }}/{{ dir.ubuntu_dir }}/{{ dir.ubuntu_dir_version[1] }}/netboot.tar.gz", dest: "{{ tftp_root_dir }}/{{ dir.ubuntu_dir }}/{{ dir.ubuntu_dir_version[1] }}"}
+- name: Copy backgroud image
+  copy:
+    src: "background.jpg"
+    dest: "{{ tftp_root_dir }}"
+- name: Mount live CD images
+  mount:
+    path: "{{ tftp_root_dir }}/{{ mount_dir }}"
+    src: "{{ tftp_root_dir }}/{{ dir.ubuntu_live_dir }}/ubuntu-16.04.7-desktop-amd64.iso"
+    fstype: iso9660
+    opts: ro
+    state: mounted
+- name: Copy exports template for nfs-server
+  template:
+    src: "exports.j2"
+    dest: "/etc/exports"
+  notify:
+    - restart ftp
+    - restart nfs

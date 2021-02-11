@@ -1,0 +1,19 @@
+option domain-name-servers {{ dhcp.dns1 }}, {{ dhcp.dns2 }};
+option ip-forwarding on;
+default-lease-time 60;
+min-lease-time 120;
+max-lease-time 300;
+authoritative;
+ddns-update-style interim;
+log-facility local7;
+shared-network PXE-Netwotk {
+  subnet {{ dhcp.subnet }} netmask {{ dhcp.netmask }} {
+  range {{ dhcp.range }};
+  option routers {{ dhcp.gw }};
+  option subnet-mask {{ dhcp.netmask }};
+  option domain-name-servers {{ dhcp.dns1 }}, {{ dhcp.dns2 }};
+  filename "{{ dhcp.filename }}";
+  next-server {{ dhcp.next_server }};
+  option root-path "{{ dhcp.root_path_address }}:{{ tftp_root_dir }}/";
+  }
+}

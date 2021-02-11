@@ -1,0 +1,6 @@
+- name: Install pxe boot server
+  hosts: pxe
+  become: yes
+  roles:
+   - ./pxe-boot-server
+

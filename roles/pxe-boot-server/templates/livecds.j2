@@ -1,0 +1,19 @@
+PROMPT 0
+UI vesamenu.c32
+MENU BACKGROUND background.jpg
+MENU TITLE LiveCDs
+
+LABEL <- Main Menu
+      KERNEL vesamenu.c32
+      APPEND pxelinux.cfg/default
+
+
+LABEL Ubuntu 16.04 LiveCD
+        KERNEL {{ mount_dir }}/casper/vmlinuz
+        APPEND root=/dev/nfs boot=casper netboot=nfs nfsroot={{ address }}:{{ tftp_root_dir }}/{{ mount_dir }} initrd={{ mount_dir }}/casper/initrd
+
+
+
+LABEL <- Main Menu
+      KERNEL vesamenu.c32
+      APPEND pxelinux.cfg/default

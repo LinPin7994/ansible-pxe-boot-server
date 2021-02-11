@@ -1,0 +1,4 @@
+TFTP_USERNAME="{{ tftp_username | default('tftp') }}"
+TFTP_DIRECTORY="{{ tftp_root_dir | default('/srv/tftp') }}"
+TFTP_ADDRESS="{{ tftp_address | default('0.0.0.0:69') }}"
+TFTP_OPTIONS="--secure -l -v -r blksize"

@@ -1,0 +1,48 @@
+<<<<<<< HEAD
+PROMPT 0
+UI vesamenu.c32
+MENU BACKGROUND background.jpg
+MENU TITLE BSD
+
+LABEL <- Main Menu
+      KERNEL vesamenu.c32
+      APPEND pxelinux.cfg/default
+
+LABEL FreeBSD-11.1-x64
+        kernel memdisk
+        initrd {{ dir.bsd_dir }}/{{ dir.bsd_dir_version[0] }}/mfsbsd-11.1-RELEASE-amd64.iso
+        append iso raw
+
+LABEL FreeBSD-12.1-x64
+        kernel memdisk
+        initrd {{ dir.bsd_dir }}/{{ dir.bsd_dir_version[1] }}/mfsbsd-12.1-RELEASE-amd64.iso
+        append iso raw
+
+
+LABEL <- Main Menu
+      KERNEL vesamenu.c32
+=======
+PROMPT 0
+UI vesamenu.c32
+MENU BACKGROUND background.jpg
+MENU TITLE BSD
+
+LABEL <- Main Menu
+      KERNEL vesamenu.c32
+      APPEND pxelinux.cfg/default
+
+LABEL FreeBSD-10.1-x64
+        kernel memdisk
+        initrd {{ dir.bsd_dir }}/{{ dir.bsd_dir_version[1] }}/mfsbsd-se-10.1-RELEASE-amd64.iso
+        append iso raw
+
+LABEL FreeBSD-9.1-x64
+        kernel memdisk
+        initrd {{ dir.bsd_dir }}/{{ dir.bsd_dir_version[0] }}s/mfsbsd-se-9.1-RELEASE-amd64.iso
+        append iso raw
+
+
+LABEL <- Main Menu
+      KERNEL vesamenu.c32
+>>>>>>> parent of 3b7e801... Add role for UP pxe-boot-server for linuxwq
+      APPEND pxelinux.cfg/default

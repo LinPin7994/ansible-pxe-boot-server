@@ -1,0 +1,15 @@
+- name: restart ftp
+  systemd:
+    state: restarted
+    name: tftpd-hpa
+    enabled: yes
+- name: restart dhcp
+  systemd:
+    state: restarted
+    name: isc-dhcp-server
+    enabled: yes
+- name: restart nfs
+  systemd:
+    state: restarted
+    name: nfs-server
+    enabled: yes
