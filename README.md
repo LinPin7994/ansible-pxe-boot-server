@@ -1,5 +1,5 @@
 # ansible-pxe-boot-server
-server for pxe linux distr boot
+pxe-boot-server for net-boot linux distr
 
 Edit roles/pxe-boot-server/defaults/main.yaml
 If you use dhcp on mikrotik set use_local_dhcp: "no" in roles/pxe-boot-server/defaults/main.yaml.
