@@ -40,3 +40,4 @@ dhcp:
   gw: "192.168.0.1"
   filename: "pxelinux.0"
   next_server: "pxe_boot_server_ip"
+  interface: "eth1"

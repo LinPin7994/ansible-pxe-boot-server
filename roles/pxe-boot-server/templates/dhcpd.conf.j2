@@ -14,6 +14,6 @@ shared-network PXE-Netwotk {
   option domain-name-servers {{ dhcp.dns1 }}, {{ dhcp.dns2 }};
   filename "{{ dhcp.filename }}";
   next-server {{ dhcp.next_server }};
-  option root-path "{{ dhcp.root_path_address }}:{{ tftp_root_dir }}/";
+  option root-path "{{ dhcp.next_server }}:{{ tftp_root_dir }}/";
   }
 }

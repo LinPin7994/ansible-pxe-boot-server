@@ -64,8 +64,17 @@
     src: "dhcpd.conf.j2"
     dest: "/etc/dhcp/dhcpd.conf"
     backup: yes
-  notify: restart dhcp
   when: use_local_dhcp == 'yes'
+- name: Add dhcp interfaces
+  lineinfile: 
+    path: /etc/default/isc-dhcp-server
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - {regexp: "^INTERFACESv4=", line: "INTERFACESv4={{ dhcp.interface }}"}
+    - {regexp: "^INTERFACESv6=", line: "#INTERFACESv6="}
+  when: use_local_dhcp == 'yes'
+  notify: restart dhcp
 - name: Download iso, kernel and initrd
   get_url:
     url: "{{ item.src }}"
