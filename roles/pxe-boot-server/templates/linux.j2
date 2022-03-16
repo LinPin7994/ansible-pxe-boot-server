@@ -14,7 +14,9 @@ LABEL Debian-9-x64
 LABEL Debian-10-x64
         kernel {{ dir.debian_dir }}/{{ dir.debian_dir_version[1] }}/debian-installer/amd64/linux
         append initrd={{ dir.debian_dir }}/{{ dir.debian_dir_version[1] }}/debian-installer/amd64/initrd.gz
-
+LABEL Debian-11-x64
+        kernel {{ dir.debian_dir }}/{{ dir.debian_dir_version[2] }}/debian-installer/amd64/linux
+        append initrd={{ dir.debian_dir }}/{{ dir.debian_dir_version[2] }}/debian-installer/amd64/initrd.gz
 LABEL CentOS-7-x64
         kernel {{ dir.centos_dir }}/{{ dir.centos_dir_version }}/vmlinuz
         append initrd={{ dir.centos_dir }}/{{ dir.centos_dir_version }}/initrd.img method=http://mirror.mirohost.net/centos/7/os/x86_64/ devfs=nomount ksdevice=link ramdisk_size=100000

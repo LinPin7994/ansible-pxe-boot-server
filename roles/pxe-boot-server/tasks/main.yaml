@@ -52,6 +52,7 @@
     - {path: "{{ tftp_root_dir }}/{{ dir.debian_dir }}"}
     - {path: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[0] }}"}
     - {path: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[1] }}"}
+    - {path: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[2] }}"}
     - {path: "{{ tftp_root_dir }}/{{ dir.centos_dir }}"}
     - {path: "{{ tftp_root_dir }}/{{ dir.centos_dir }}/{{ dir.centos_dir_version }}"}
     - {path: "{{ tftp_root_dir }}/{{ dir.ubuntu_dir }}"}
@@ -86,6 +87,7 @@
    - {src: "{{ url.centos_7_kernel }}", dest: "{{ tftp_root_dir }}/{{ dir.centos_dir }}/{{ dir.centos_dir_version }}/vmlinuz"}
    - {src: "{{ url.debian_9 }}", dest: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[0] }}/netboot.tar.gz"}
    - {src: "{{ url.debian_10 }}", dest: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[1] }}/netboot.tar.gz"}
+   - {src: "{{ url.debian_11 }}", dest: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[2] }}/netboot.tar.gz"}
    - {src: "{{ url.ubuntu_xenial }}", dest: "{{ tftp_root_dir }}/{{ dir.ubuntu_dir }}/{{ dir.ubuntu_dir_version[0] }}/netboot.tar.gz"}
    - {src: "{{ url.ubuntu_focal }}", dest: "{{ tftp_root_dir }}/{{ dir.ubuntu_dir }}/{{ dir.ubuntu_dir_version[1] }}/netboot.tar.gz"}
    - {src: "{{ url.ubuntu_xenial_live }}", dest: "{{ tftp_root_dir }}/{{ dir.ubuntu_live_dir }}/ubuntu-16.04.7-desktop-amd64.iso"}
@@ -97,6 +99,7 @@
   loop:
    - {src: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[0] }}/netboot.tar.gz", dest: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[0] }}"}
    - {src: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[1] }}/netboot.tar.gz", dest: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[1] }}"}
+   - {src: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[2] }}/netboot.tar.gz", dest: "{{ tftp_root_dir }}/{{ dir.debian_dir }}/{{ dir.debian_dir_version[2] }}"}
    - {src: "{{ tftp_root_dir }}/{{ dir.ubuntu_dir }}/{{ dir.ubuntu_dir_version[0] }}/netboot.tar.gz", dest: "{{ tftp_root_dir }}/{{ dir.ubuntu_dir }}/{{ dir.ubuntu_dir_version[0] }}"}
    - {src: "{{ tftp_root_dir }}/{{ dir.ubuntu_dir }}/{{ dir.ubuntu_dir_version[1] }}/netboot.tar.gz", dest: "{{ tftp_root_dir }}/{{ dir.ubuntu_dir }}/{{ dir.ubuntu_dir_version[1] }}"}
 - name: Copy backgroud image
@@ -110,6 +113,7 @@
     fstype: iso9660
     opts: ro
     state: mounted
+  tags: mount
 - name: Copy exports template for nfs-server
   template:
     src: "exports.j2"
